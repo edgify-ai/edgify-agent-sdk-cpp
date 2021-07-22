@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package edgify;
+option go_package="edgifypb";
+
+message PredictionItem {
+  repeated string data = 1;
+}
+
+message Prediction {
+  string uuid = 1;
+  uint32 duration = 2;
+  string predicted_at = 3;
+  uint32 model_id = 4;
+  repeated PredictionItem predictions=5;
+  Image image = 6;
+  string source = 7;
+  bool certain = 8;
+}
+
+message Image {
+  string uuid = 1;
+  bytes image = 2;
+  string group_id = 3;
+}
+
+message ModelDeployment {
+  uint32 id = 1;
+  uint32 model_id = 2;
+  string model_path = 3;
+  string config_path = 4;
+  bool verified = 5;
+  google.protobuf.Timestamp created_at  = 6;
+}
+
+message GroundTruth {
+  Prediction prediction = 1;
+  string label = 2;
+  string source = 3;
+}
+
+message PredictionRequest {
+  Image image = 1;
+  bool withoutPrediction = 2;
+  string source = 3;
+}
+
+message PredictionResponse {
+  Prediction prediction = 1;
+}
+
+message GroundTruthRequest {
+  GroundTruth ground_truth = 1;
+  string source = 2;
+}
+
+message GroundTruthResponse {
+} 
+
+message GetCurrentModelDeploymentRequest {
+}
+
+message GetCurrentModelDeploymentResponse {
+  ModelDeployment model_deployment=1;
+} 
+
+service EdgifyService{
+  rpc GetPrediction(PredictionRequest) returns (PredictionResponse) {};
+  rpc CreateGroundTruth(GroundTruthRequest) returns (GroundTruthResponse) {};
+  rpc GetCurrentModelDeployment(GetCurrentModelDeploymentRequest) returns (GetCurrentModelDeploymentResponse) {};
+}
